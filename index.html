@@ -23,8 +23,8 @@
       <h2>Shows the USDT balance of using getBalance from Web3.js</h2>
       <form class="balance_form">
         <div class="form-el">
-          <label for="token">USDT token:</label>
-          <input class="token" value="0xdAC17F958D2ee523a2206206994597C13D831ec7" id="token" placeholder="USDT token" type="text">
+          <label for="token">Address:</label>
+          <input class="token" value="0xdAC17F958D2ee523a2206206994597C13D831ec7" id="token" placeholder="Address" type="text">
         </div>
         <div class="form-el">
           <label for="unit">Unit:</label>
@@ -37,7 +37,20 @@
         <span class="val_balance"> </span><span class="unit_bal"></span>
       </div>
     </div>
-
+    <div class="usdt_balance">
+      <h2>Shows the USDT balance of using balanceOf from Smart Contract</h2>
+      <form class="balance_form">
+        <div class="form-el">
+          <label for="token_1">Address:</label>
+          <input class="token" value="0xdAC17F958D2ee523a2206206994597C13D831ec7" id="token_1" placeholder="Address" type="text">
+        </div>
+        <button type="submit">Show balance</button>
+      </form>
+      <div class="result_balance">
+        <span><span class="account_name"></span> balance of is:</span>
+        <span class="val_balance"> </span>
+      </div>
+    </div>
   </div>
   <script type="module" src="./dist/js/bundle.js"></script>
 </body>

@@ -5,12 +5,23 @@ const refreshBlock = <HTMLElement>document.querySelector(".ref");
 const lodar: string = `<i class="fa fa-refresh"></i>`;
 const lastBlockContainer = <HTMLElement>document.querySelector(".data");
 //getBalance
-const balanceForm :NodeListOf<HTMLFormElement>  =  document.querySelectorAll(".balance_form");
+const balanceForm: NodeListOf<HTMLFormElement> =
+  document.querySelectorAll(".balance_form");
 const unitSelect = <HTMLSelectElement>document.querySelector(".unit");
 const selectedUnit = <HTMLElement>document.querySelector(".unit_bal");
-const valBalance :NodeListOf<HTMLElement> = document.querySelectorAll(".val_balance");
-const tokenContract :NodeListOf<HTMLInputElement> = document.querySelectorAll(".token");
+const valBalance: NodeListOf<HTMLElement> =
+  document.querySelectorAll(".val_balance");
+const tokenContract: NodeListOf<HTMLInputElement> =
+  document.querySelectorAll(".token");
+
+//balanceOf
+const accountName = <HTMLElement>document.querySelector(".account_name");
 /* End HTML Celectores */
+
+/* Error Messages */
+const errMes = "Some Thing went wrong please try again !";
+const validMes = "Please enter valid Token !!";
+/* Error Messages */
 
 /* Start Connect with Ethereum Nodes using Web3.js */
 const Web3: any = require("web3"); // For using library, to make it work in browser i used browserify library
@@ -49,7 +60,7 @@ const refreshHandler = (): void => {
     })
     .catch((err: string): void => {
       lastBlockContainer.classList.remove("rotate");
-      lastBlockNmber.innerHTML = "Some Thing went wrong please try again !";
+      lastBlockNmber.innerHTML = errMes;
     });
 };
 
@@ -103,14 +114,13 @@ unitMapArr.forEach((e) => {
   } value=${e}>${e === "tether" ? "tether USDT" : e}</option>`;
 });
 
-
 /**
- *
+ * firstWayBalance()
  * @param address The token entered.
  * @param unit The unit entered.
  * @returns Promise from getBalance() and fromWei() which used from Web3.js to fetch data.
  */
-function balance(address: string, unit: string): Promise<string> {
+function firstWayBalance(address: string, unit: string): Promise<string> {
   const balanceVal: Promise<string> = new Promise<string>((res, rej) => {
     // To chake if a valid address.
     if (address.length === 42) {
@@ -123,25 +133,25 @@ function balance(address: string, unit: string): Promise<string> {
         })
         .catch((err: string): void => {
           selectedUnit.innerText = "";
-          valBalance[0].innerText = "Some Thing went wrong please try again !";
+          valBalance[0].innerText = errMes;
         });
     } else {
-      rej("Please enter valid Token !!");
+      rej(validMes);
     }
   });
   return balanceVal;
 }
 
 /**
- * balanceHandler()
+ * getBalanceHandler()
  * Function to handle submit form.
- * using balance() to get balance of addreses entered and output data in page.
+ * using firstWayBalance() to get balance of addreses entered and output data in page.
  */
-const balanceHandler = (): void => {
+const getBalanceHandler = (): void => {
   balanceForm[0].classList.add("send");
   valBalance[0].innerHTML = lodar;
   selectedUnit.innerText = "";
-  balance(tokenContract[0].value, unitSelect.value).then(
+  firstWayBalance(tokenContract[0].value, unitSelect.value).then(
     (res: string): void => {
       selectedUnit.innerText = " " + unitSelect.value;
       valBalance[0].innerText = " " + res;
@@ -155,13 +165,123 @@ const balanceHandler = (): void => {
 };
 
 /**
- * Event to listen show balance button then trigger balanceHandler()
+ * Event to listen show balance button then trigger getBalanceHandler()
  */
 balanceForm[0].addEventListener("submit", (e): void => {
   e.preventDefault();
-  balanceHandler();
+  getBalanceHandler();
 });
 
 //For load data when page opened.
-balanceHandler();
+getBalanceHandler();
 /* End USDT balance of a provided address using getBalance() */
+
+/* Start USDT balance of a provided address using balanceOf() */
+
+type ABI = {
+  constant: boolean;
+  inputs: {
+    name: string;
+    type: string;
+  }[];
+  name: string;
+  outputs: {
+    name: string;
+    type: string;
+  }[];
+  payable: boolean;
+  stateMutability: string;
+  type: string;
+}[];
+
+//abi contain methods we used.
+const abi: ABI = [
+  {
+    constant: true,
+    inputs: [],
+    name: "name",
+    outputs: [{ name: "", type: "string" }],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [{ name: "who", type: "address" }],
+    name: "balanceOf",
+    outputs: [{ name: "", type: "uint256" }],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+];
+
+/**
+ * secondWayBalance()
+ * @param abi The abi array contain name and balanceOf methods.
+ * @param address The address to get balance of for it.
+ * @returns array contain two promises the first for balance of and second for name, or false if address not valid.
+ */
+function secondWayBalance(
+  abi: ABI,
+  address: string
+): Promise<string>[] | false {
+  if (address.length === 42) {
+    const contract = new web3.eth.Contract(abi, address);
+    let data: Promise<string>[] = [];
+    data.push(
+      new Promise<string>((res): void => {
+        res(contract.methods.balanceOf(address).call().then());
+      })
+    );
+
+    data.push(
+      new Promise<string>((res): void => {
+        res(contract.methods.name().call().then());
+      })
+    );
+    return data;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * balaneOfHandler()
+ * Function to handle submit form.
+ * using secondWayBalance() to get balance of addreses entered and output data in page.
+ */
+function balaneOfHandler() {
+  let data: Promise<string>[] | boolean = secondWayBalance(abi, tokenContract[1].value);
+  if(data) {
+    balanceForm[1].classList.add("send");
+    valBalance[1].innerHTML = lodar;
+    accountName.innerText = "";
+    data[0].then((res) :void => {
+      valBalance[1].innerText = res;
+    }).catch((err):void => {
+      valBalance[1].innerText = errMes;
+    })
+    data[1].then((res):void => {
+      accountName.innerText = res;
+    }).catch((err):void => {
+      accountName.innerText = "undefined";
+    })
+    balanceForm[1].classList.remove("send");
+  } else {
+    valBalance[1].innerText = validMes;
+    accountName.innerText = "undefined";
+  }
+}
+
+/**
+ * Event to listen show balance button then trigger getBalanceHandler()
+ */
+balanceForm[1].addEventListener("submit", (e): void => {
+  e.preventDefault();
+  balaneOfHandler();
+});
+
+//For load data when page opened.
+balaneOfHandler();
+/* End USDT balance of a provided address using balanceOf() */

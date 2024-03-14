@@ -8,6 +8,9 @@ const unitSelect = document.querySelector(".unit");
 const selectedUnit = document.querySelector(".unit_bal");
 const valBalance = document.querySelectorAll(".val_balance");
 const tokenContract = document.querySelectorAll(".token");
+const accountName = document.querySelector(".account_name");
+const errMes = "Some Thing went wrong please try again !";
+const validMes = "Please enter valid Token !!";
 const Web3 = require("web3");
 const InfuraUrl = "https://mainnet.infura.io/v3/4b3d854ca37b4efaba96bda1eae8525a";
 const web3 = new Web3(InfuraUrl);
@@ -27,7 +30,7 @@ const refreshHandler = () => {
     })
         .catch((err) => {
         lastBlockContainer.classList.remove("rotate");
-        lastBlockNmber.innerHTML = "Some Thing went wrong please try again !";
+        lastBlockNmber.innerHTML = errMes;
     });
 };
 refreshBlock.addEventListener("click", () => {
@@ -64,7 +67,7 @@ const unitMapArr = Object.keys(unitMap);
 unitMapArr.forEach((e) => {
     unitSelect.innerHTML += `<option ${e === "tether" ? "selected" : ""} value=${e}>${e === "tether" ? "tether USDT" : e}</option>`;
 });
-function balance(address, unit) {
+function firstWayBalance(address, unit) {
     const balanceVal = new Promise((res, rej) => {
         if (address.length === 42) {
             web3.eth
@@ -74,20 +77,20 @@ function balance(address, unit) {
             })
                 .catch((err) => {
                 selectedUnit.innerText = "";
-                valBalance[0].innerText = "Some Thing went wrong please try again !";
+                valBalance[0].innerText = errMes;
             });
         }
         else {
-            rej("Please enter valid Token !!");
+            rej(validMes);
         }
     });
     return balanceVal;
 }
-const balanceHandler = () => {
+const getBalanceHandler = () => {
     balanceForm[0].classList.add("send");
     valBalance[0].innerHTML = lodar;
     selectedUnit.innerText = "";
-    balance(tokenContract[0].value, unitSelect.value).then((res) => {
+    firstWayBalance(tokenContract[0].value, unitSelect.value).then((res) => {
         selectedUnit.innerText = " " + unitSelect.value;
         valBalance[0].innerText = " " + res;
     }, (rej) => {
@@ -98,6 +101,70 @@ const balanceHandler = () => {
 };
 balanceForm[0].addEventListener("submit", (e) => {
     e.preventDefault();
-    balanceHandler();
+    getBalanceHandler();
 });
-balanceHandler();
+getBalanceHandler();
+const abi = [
+    {
+        constant: true,
+        inputs: [],
+        name: "name",
+        outputs: [{ name: "", type: "string" }],
+        payable: false,
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        constant: true,
+        inputs: [{ name: "who", type: "address" }],
+        name: "balanceOf",
+        outputs: [{ name: "", type: "uint256" }],
+        payable: false,
+        stateMutability: "view",
+        type: "function",
+    },
+];
+function secondWayBalance(abi, address) {
+    if (address.length === 42) {
+        const contract = new web3.eth.Contract(abi, address);
+        let data = [];
+        data.push(new Promise((res) => {
+            res(contract.methods.balanceOf(address).call().then());
+        }));
+        data.push(new Promise((res) => {
+            res(contract.methods.name().call().then());
+        }));
+        return data;
+    }
+    else {
+        return false;
+    }
+}
+function balaneOfHandler() {
+    let data = secondWayBalance(abi, tokenContract[1].value);
+    if (data) {
+        balanceForm[1].classList.add("send");
+        valBalance[1].innerHTML = lodar;
+        accountName.innerText = "";
+        data[0].then((res) => {
+            valBalance[1].innerText = res;
+        }).catch((err) => {
+            valBalance[1].innerText = errMes;
+        });
+        data[1].then((res) => {
+            accountName.innerText = res;
+        }).catch((err) => {
+            accountName.innerText = "undefined";
+        });
+        balanceForm[1].classList.remove("send");
+    }
+    else {
+        valBalance[1].innerText = validMes;
+        accountName.innerText = "undefined";
+    }
+}
+balanceForm[1].addEventListener("submit", (e) => {
+    e.preventDefault();
+    balaneOfHandler();
+});
+balaneOfHandler();
