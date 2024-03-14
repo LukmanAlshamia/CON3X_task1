@@ -1,0 +1,161 @@
+/* Scroll Style */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: #020d1c;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.87);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.87);
+}
+/* Scroll Style */
+
+input:focus::placeholder {
+  color: transparent;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background-color: #020d1c;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.container {
+  margin-top: 40px;
+  position: relative;
+}
+
+/* Start Last block */
+.last_block {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.last_block .logo {
+  width: 80px;
+  height: 80px;
+}
+
+.last_block .logo img {
+  width: 100%;
+  height: 100%;
+}
+
+.last_block .data h1 {
+  margin-bottom: 7px;
+  letter-spacing: 1px;
+}
+
+.last_block .data span {
+  display: block;
+  font-size: 14px;
+}
+
+.last_block .data span i,
+.val_balance i {
+  background: #ffffff1a;
+  padding: 4px;
+  font-weight: 100;
+  font-size: 12px;
+  border-radius: 30px;
+  cursor: pointer;
+}
+
+.last_block .data.rotate span i,
+.val_balance i {
+  animation: Rotation 2s infinite;
+}
+
+.last_block .data span.block_number {
+  font-size: 18px;
+}
+
+.last_block .data span.block_number i {
+  font-size: 18px;
+  cursor: auto;
+}
+/* End Last block */
+
+/* Start USDT balance of */
+.usdt_balance {
+  padding-left: 13px;
+  margin-bottom: 25px;
+}
+.usdt_balance h2 {
+  text-align: center;
+  width: 80%;
+  margin: 0 auto;
+}
+.usdt_balance form {
+  margin-bottom: 10px;
+}
+
+.usdt_balance form button {
+  cursor: pointer;
+}
+.usdt_balance form button:hover {
+  background: #020d1c;
+}
+.usdt_balance form.send button {
+  background: #020d1c;
+  pointer-events: none;
+}
+
+.usdt_balance form button,
+.usdt_balance select,
+.usdt_balance select option,
+.usdt_balance input {
+  color: rgba(255, 255, 255, 0.87);
+  background: #1c2633;
+}
+
+.usdt_balance form button,
+.usdt_balance select,
+.usdt_balance input {
+  border: none;
+  outline: none;
+  border-radius: 3px;
+  border: 2px solid #000;
+  height: 45px;
+  font-size: 15px;
+  width: 100%;
+  padding: 10px 15px;
+  margin-bottom: 5px;
+}
+
+.form-el label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* End USDT balance of */
+
+@keyframes Rotation {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

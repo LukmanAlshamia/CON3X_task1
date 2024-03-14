@@ -3,10 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./dist/css/main.css">
   <title>Document</title>
 </head>
 <body>
-  
-  <script type="module" src="./dist/bundle.js"></script>
+  <div class="container">
+    <div class="last_block">
+      <div class="logo">
+        <img src="./src/assets/Ethereum .svg" alt="Ethereum_Logo">
+      </div>
+      <div class="data">
+        <h1>Ethereum </h1>
+        <span>Block Height <i class="fa fa-refresh ref"></i></span>
+        <span class="block_number"><i class="fa fa-refresh"></i></span>
+      </div>
+    </div>
+    <div class="usdt_balance">
+      <h2>Shows the USDT balance of using getBalance from Web3.js</h2>
+      <form class="balance_form">
+        <div class="form-el">
+          <label for="token">USDT token:</label>
+          <input class="token" value="0xdAC17F958D2ee523a2206206994597C13D831ec7" id="token" placeholder="USDT token" type="text">
+        </div>
+        <div class="form-el">
+          <label for="unit">Unit:</label>
+          <select id="unit" class="unit"></select>
+        </div>
+        <button type="submit">Show balance</button>
+      </form>
+      <div class="result_balance">
+        <span>The balance of is:</span>
+        <span class="val_balance"> </span><span class="unit_bal"></span>
+      </div>
+    </div>
+
+  </div>
+  <script type="module" src="./dist/js/bundle.js"></script>
 </body>
 </html>
