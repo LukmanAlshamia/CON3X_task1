@@ -1,4 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const lastBlock_1 = __importDefault(require("./lastBlock"));
+const firstWayBalance_1 = __importDefault(require("./firstWayBalance"));
+const Constents_1 = require("./Constents");
+const secondWayBalance_1 = __importDefault(require("./secondWayBalance"));
 const lastBlockNmber = document.querySelector(".block_number");
 const refreshBlock = document.querySelector(".ref");
 const lodar = `<i class="fa fa-refresh"></i>`;
@@ -9,28 +17,15 @@ const selectedUnit = document.querySelector(".unit_bal");
 const valBalance = document.querySelectorAll(".val_balance");
 const tokenContract = document.querySelectorAll(".token");
 const accountName = document.querySelector(".account_name");
-const errMes = "Some Thing went wrong please try again !";
-const validMes = "Please enter valid Token !!";
-const Web3 = require("web3");
-const InfuraUrl = "https://mainnet.infura.io/v3/4b3d854ca37b4efaba96bda1eae8525a";
-const web3 = new Web3(InfuraUrl);
-function lastBlock() {
-    const blockNum = new Promise((res) => {
-        res(web3.eth.getBlockNumber().then());
-    });
-    return blockNum;
-}
 const refreshHandler = () => {
     lastBlockContainer.classList.add("rotate");
     lastBlockNmber.innerHTML = lodar;
-    lastBlock()
-        .then((lastBlock) => {
+    (0, lastBlock_1.default)().then((lastBlock) => {
         lastBlockContainer.classList.remove("rotate");
         lastBlockNmber.innerHTML = lastBlock;
-    })
-        .catch((err) => {
+    }, (err) => {
         lastBlockContainer.classList.remove("rotate");
-        lastBlockNmber.innerHTML = errMes;
+        lastBlockNmber.innerHTML = err;
     });
 };
 refreshBlock.addEventListener("click", () => {
@@ -67,30 +62,11 @@ const unitMapArr = Object.keys(unitMap);
 unitMapArr.forEach((e) => {
     unitSelect.innerHTML += `<option ${e === "tether" ? "selected" : ""} value=${e}>${e === "tether" ? "tether USDT" : e}</option>`;
 });
-function firstWayBalance(address, unit) {
-    const balanceVal = new Promise((res, rej) => {
-        if (address.length === 42) {
-            web3.eth
-                .getBalance(address)
-                .then((balance) => {
-                res(web3.utils.fromWei(balance, unit));
-            })
-                .catch((err) => {
-                selectedUnit.innerText = "";
-                valBalance[0].innerText = errMes;
-            });
-        }
-        else {
-            rej(validMes);
-        }
-    });
-    return balanceVal;
-}
 const getBalanceHandler = () => {
     balanceForm[0].classList.add("send");
     valBalance[0].innerHTML = lodar;
     selectedUnit.innerText = "";
-    firstWayBalance(tokenContract[0].value, unitSelect.value).then((res) => {
+    (0, firstWayBalance_1.default)(tokenContract[0].value, unitSelect.value).then((res) => {
         selectedUnit.innerText = " " + unitSelect.value;
         valBalance[0].innerText = " " + res;
     }, (rej) => {
@@ -104,62 +80,26 @@ balanceForm[0].addEventListener("submit", (e) => {
     getBalanceHandler();
 });
 getBalanceHandler();
-const abi = [
-    {
-        constant: true,
-        inputs: [],
-        name: "name",
-        outputs: [{ name: "", type: "string" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function",
-    },
-    {
-        constant: true,
-        inputs: [{ name: "who", type: "address" }],
-        name: "balanceOf",
-        outputs: [{ name: "", type: "uint256" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function",
-    },
-];
-function secondWayBalance(abi, address) {
-    if (address.length === 42) {
-        const contract = new web3.eth.Contract(abi, address);
-        let data = [];
-        data.push(new Promise((res) => {
-            res(contract.methods.balanceOf(address).call().then());
-        }));
-        data.push(new Promise((res) => {
-            res(contract.methods.name().call().then());
-        }));
-        return data;
-    }
-    else {
-        return false;
-    }
-}
 function balaneOfHandler() {
-    let data = secondWayBalance(abi, tokenContract[1].value);
+    let data = (0, secondWayBalance_1.default)(Constents_1.abi, tokenContract[1].value);
     if (data) {
         balanceForm[1].classList.add("send");
         valBalance[1].innerHTML = lodar;
         accountName.innerText = "";
         data[0].then((res) => {
             valBalance[1].innerText = res;
-        }).catch((err) => {
-            valBalance[1].innerText = errMes;
+        }, (err) => {
+            valBalance[1].innerText = err;
         });
         data[1].then((res) => {
             accountName.innerText = res;
-        }).catch((err) => {
-            accountName.innerText = "undefined";
+        }, (rej) => {
+            accountName.innerText = rej;
         });
         balanceForm[1].classList.remove("send");
     }
     else {
-        valBalance[1].innerText = validMes;
+        valBalance[1].innerText = Constents_1.validMes;
         accountName.innerText = "undefined";
     }
 }
