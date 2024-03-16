@@ -4,7 +4,7 @@
 
 # Dependencies
 
-### web3.js
+### [web3.js](https://web3js.org/)
 
 # DevDependencies
 
