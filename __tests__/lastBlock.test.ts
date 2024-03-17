@@ -11,7 +11,7 @@ beforeAll(async () => {
       last = res;
     })
     .catch((err) => {});
-});
+}, 10000);
 
 describe("Testing the last block number of Ethereum mainnet.", () => {
   test("Return the last block number", async () => {
@@ -24,5 +24,5 @@ describe("Testing the last block number of Ethereum mainnet.", () => {
         expect(rej).toBe(errMes);
       }
     );
-  });
+  }, 10000);
 });
